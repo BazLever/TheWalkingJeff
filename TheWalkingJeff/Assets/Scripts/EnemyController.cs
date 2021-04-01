@@ -45,18 +45,22 @@ public class EnemyController : MonoBehaviour
         if (isDead)
             Destroy(gameObject);
 
-        if (Physics.Raycast(transform.position, playerPos.position - transform.position, Vector3.Distance(transform.position, playerPos.position)))
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, playerPos.position - transform.position, out hit, Vector3.Distance(transform.position, playerPos.position)))
         {
-            if (Vector3.SqrMagnitude(playerPos.position - transform.position) > ((attackDistance * 0.5f) * (attackDistance * 0.5f)))
-                charController.Move((playerPos.position - transform.position).normalized * walkSpeed * Time.deltaTime);
-
-            if (timerBetweenAttacks <= 0 && Vector3.SqrMagnitude(playerPos.position - transform.position) < (attackDistance * attackDistance))
+            if (hit.collider.CompareTag("Player"))
             {
-                player.TakeDamage(attackDamage);
-                timerBetweenAttacks = timeBetweenAttacks;
+                if (Vector3.SqrMagnitude(playerPos.position - transform.position) > ((attackDistance * 0.5f) * (attackDistance * 0.5f)))
+                    charController.Move((playerPos.position - transform.position).normalized * walkSpeed * Time.deltaTime);
+
+                if (timerBetweenAttacks <= 0 && Vector3.SqrMagnitude(playerPos.position - transform.position) < (attackDistance * attackDistance))
+                {
+                    player.TakeDamage(attackDamage);
+                    timerBetweenAttacks = timeBetweenAttacks;
+                }
+                else
+                    timerBetweenAttacks -= Time.deltaTime;
             }
-            else
-                timerBetweenAttacks -= Time.deltaTime;
         }
         else
         {
